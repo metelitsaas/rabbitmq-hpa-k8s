@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: producer-app
+  namespace: dev
+  labels:
+    app: producer-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: producer-app
+  template:
+    metadata:
+      labels:
+        app: producer-app
+    spec:
+      containers:
+        - name: producer-app
+          image: producer-app:1.0
