@@ -1,11 +1,6 @@
-import time
-import json
 import pika
 import pika.exceptions
 from utils.logger import logger
-from functions import *
-
-UPDATE_PERIOD = 1  # second
 
 RABBITMQ_HOST = '192.168.99.106'
 RABBITMQ_PORT = 32037
@@ -28,13 +23,8 @@ def main():
         channel = connection.channel()
         channel.queue_declare(RABBITMQ_QUEUE)
 
-        while True:
-            data = generate_fake_data()
-            channel.basic_publish(exchange='',
-                                  routing_key=RABBITMQ_QUEUE,
-                                  body=json.dumps(data))
-            logger.info(data)
-            time.sleep(1)
+        channel.basic_consume(RABBITMQ_QUEUE, callback, auto_ack=True)
+        channel.start_consuming()
 
     except Exception as pika_ex:
         logger.warning(pika_ex)
@@ -43,14 +33,18 @@ def main():
         connection.close()
 
 
+def callback(ch, method, properties, body):
+    logger.info(body)
+
+
 if __name__ == '__main__':
 
     try:
-        logger.info('Producer application started')
+        logger.info('Consumer application started')
         main()
 
     except Exception as exception:
         logger.warning(exception)
 
     finally:
-        logger.info('Producer application stopped')
+        logger.info('Consumer application stopped')
