@@ -30,15 +30,16 @@ def main():
         channel = connection.channel()
 
         # Define exchange
-        channel.exchange_declare(exchange='logs',
-                                 exchange_type='fanout')
+        channel.exchange_declare(exchange='direct_logs',
+                                 exchange_type='direct')
 
         # Define queue
         result = channel.queue_declare(queue='', exclusive=True)  # Create durable queue with dynamic name
         queue_name = result.method.queue
 
         # Define bind
-        channel.queue_bind(exchange='logs', queue=queue_name)
+        #channel.queue_bind(exchange='direct_logs', queue=queue_name, routing_key='info')
+        channel.queue_bind(exchange='direct_logs', queue=queue_name, routing_key='error')
 
         # Consume messages from queue
         channel.basic_qos(prefetch_count=1)  # receive only one message until confirm acknowledge
