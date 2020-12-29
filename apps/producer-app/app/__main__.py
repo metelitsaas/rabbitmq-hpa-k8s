@@ -1,18 +1,19 @@
 import time
+import random
 import json
 import pika
 import pika.exceptions
 from utils.logger import logger
 from functions import *
 
-UPDATE_PERIOD = 1  # second
+UPDATE_PERIOD = 3  # second
 
-RABBITMQ_HOST = '192.168.99.106'
-RABBITMQ_PORT = 32037
-RABBITMQ_LOGIN = 'QW5uCWWkLdEkiWcHcLl1vLB-VgjYL0at'
-RABBITMQ_PASS = 'XFr5TnE55Nnn_dM6YpecoCykVnjSXiz7'
+RABBITMQ_HOST = '192.168.99.107'
+RABBITMQ_PORT = 30999
+RABBITMQ_LOGIN = 'FCv8IRXQVICBfUupdMsBOxk71o7JKd2r'
+RABBITMQ_PASS = 'mWsrsUhzhH1EH57Sze6DxWpX64cGqNvB'
 RABBITMQ_VIRTUAL_HOST = '/'
-RABBITMQ_QUEUE = 'person_queue'
+RABBITMQ_QUEUE = 'person_durable_queue'
 
 
 def main():
@@ -20,21 +21,34 @@ def main():
     connection = None
 
     try:
+        # Create connection
         credentials = pika.PlainCredentials(RABBITMQ_LOGIN, RABBITMQ_PASS)
         connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST,
                                                                        port=RABBITMQ_PORT,
                                                                        virtual_host=RABBITMQ_VIRTUAL_HOST,
                                                                        credentials=credentials))
+        # Define channel
         channel = connection.channel()
-        channel.queue_declare(RABBITMQ_QUEUE)
+        channel.queue_declare(RABBITMQ_QUEUE, durable=True)  # Create durable queue
 
+        # Produce messages in loop with latency
+        counter = 1
         while True:
-            data = generate_fake_data()
+            message = generate_fake_data()
+            data = {
+                'id': counter,
+                'message': message
+            }
             channel.basic_publish(exchange='',
                                   routing_key=RABBITMQ_QUEUE,
-                                  body=json.dumps(data))
+                                  body=json.dumps(data),  # Serialized json
+                                  properties=pika.BasicProperties(
+                                      delivery_mode=2,  # Make message persistent
+                                  ))
+
+            counter += 1
             logger.info(data)
-            time.sleep(1)
+            time.sleep(random.randrange(UPDATE_PERIOD))
 
     except Exception as pika_ex:
         logger.warning(pika_ex)

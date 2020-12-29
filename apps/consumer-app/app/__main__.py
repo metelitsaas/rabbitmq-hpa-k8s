@@ -1,13 +1,18 @@
+import time
+import random
+import json
 import pika
 import pika.exceptions
 from utils.logger import logger
 
-RABBITMQ_HOST = '192.168.99.106'
-RABBITMQ_PORT = 32037
-RABBITMQ_LOGIN = 'QW5uCWWkLdEkiWcHcLl1vLB-VgjYL0at'
-RABBITMQ_PASS = 'XFr5TnE55Nnn_dM6YpecoCykVnjSXiz7'
+UPDATE_PERIOD = 3  # second
+
+RABBITMQ_HOST = '192.168.99.107'
+RABBITMQ_PORT = 30999
+RABBITMQ_LOGIN = 'FCv8IRXQVICBfUupdMsBOxk71o7JKd2r'
+RABBITMQ_PASS = 'mWsrsUhzhH1EH57Sze6DxWpX64cGqNvB'
 RABBITMQ_VIRTUAL_HOST = '/'
-RABBITMQ_QUEUE = 'person_queue'
+RABBITMQ_QUEUE = 'person_durable_queue'
 
 
 def main():
@@ -15,15 +20,19 @@ def main():
     connection = None
 
     try:
+        # Create connection
         credentials = pika.PlainCredentials(RABBITMQ_LOGIN, RABBITMQ_PASS)
         connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST,
                                                                        port=RABBITMQ_PORT,
                                                                        virtual_host=RABBITMQ_VIRTUAL_HOST,
                                                                        credentials=credentials))
+        # Define channel
         channel = connection.channel()
-        channel.queue_declare(RABBITMQ_QUEUE)
+        channel.queue_declare(RABBITMQ_QUEUE, durable=True)
 
-        channel.basic_consume(RABBITMQ_QUEUE, callback, auto_ack=True)
+        # Consume messages from queue
+        channel.basic_qos(prefetch_count=1)  # receive only one message until confirm acknowledge
+        channel.basic_consume(RABBITMQ_QUEUE, callback)
         channel.start_consuming()
 
     except Exception as pika_ex:
@@ -34,7 +43,10 @@ def main():
 
 
 def callback(ch, method, properties, body):
-    logger.info(body)
+    # Latency simulation
+    time.sleep(random.randrange(UPDATE_PERIOD))
+    logger.info(json.loads(body))
+    ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
 if __name__ == '__main__':
