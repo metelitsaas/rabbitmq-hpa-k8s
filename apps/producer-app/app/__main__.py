@@ -29,7 +29,10 @@ def main():
                                                                        credentials=credentials))
         # Define channel
         channel = connection.channel()
-        channel.queue_declare(RABBITMQ_QUEUE, durable=True)  # Create durable queue
+
+        # Define exchange
+        channel.exchange_declare(exchange='logs',
+                                 exchange_type='fanout')
 
         # Produce messages in loop with latency
         counter = 1
@@ -39,12 +42,10 @@ def main():
                 'id': counter,
                 'message': message
             }
-            channel.basic_publish(exchange='',
-                                  routing_key=RABBITMQ_QUEUE,
+            channel.basic_publish(exchange='logs',
+                                  routing_key='',
                                   body=json.dumps(data),  # Serialized json
-                                  properties=pika.BasicProperties(
-                                      delivery_mode=2,  # Make message persistent
-                                  ))
+                                  )
 
             counter += 1
             logger.info(data)

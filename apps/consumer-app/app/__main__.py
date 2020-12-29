@@ -28,11 +28,21 @@ def main():
                                                                        credentials=credentials))
         # Define channel
         channel = connection.channel()
-        channel.queue_declare(RABBITMQ_QUEUE, durable=True)
+
+        # Define exchange
+        channel.exchange_declare(exchange='logs',
+                                 exchange_type='fanout')
+
+        # Define queue
+        result = channel.queue_declare(queue='', exclusive=True)  # Create durable queue with dynamic name
+        queue_name = result.method.queue
+
+        # Define bind
+        channel.queue_bind(exchange='logs', queue=queue_name)
 
         # Consume messages from queue
         channel.basic_qos(prefetch_count=1)  # receive only one message until confirm acknowledge
-        channel.basic_consume(RABBITMQ_QUEUE, callback)
+        channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
         channel.start_consuming()
 
     except Exception as pika_ex:
@@ -46,7 +56,6 @@ def callback(ch, method, properties, body):
     # Latency simulation
     time.sleep(random.randrange(UPDATE_PERIOD))
     logger.info(json.loads(body))
-    ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
 if __name__ == '__main__':
