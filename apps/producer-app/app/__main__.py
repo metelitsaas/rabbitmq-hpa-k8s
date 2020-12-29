@@ -31,20 +31,20 @@ def main():
         channel = connection.channel()
 
         # Define exchange
-        channel.exchange_declare(exchange='direct_logs',
-                                 exchange_type='direct')
+        channel.exchange_declare(exchange='topic_logs',
+                                 exchange_type='topic')
 
         # Produce messages in loop with latency
         counter = 1
         while True:
             message = generate_fake_data()
-            severity = 'error' if counter % 10 == 1 else 'info'
+            routing_key = 'test.name.example' if counter % 10 == 1 else 'test.type.text'
             data = {
                 'id': counter,
                 'message': message
             }
-            channel.basic_publish(exchange='direct_logs',
-                                  routing_key=severity,
+            channel.basic_publish(exchange='topic_logs',
+                                  routing_key=routing_key,
                                   body=json.dumps(data),  # Serialized json
                                   )
 
