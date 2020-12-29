@@ -13,7 +13,7 @@ RABBITMQ_PORT = 30999
 RABBITMQ_LOGIN = 'FCv8IRXQVICBfUupdMsBOxk71o7JKd2r'
 RABBITMQ_PASS = 'mWsrsUhzhH1EH57Sze6DxWpX64cGqNvB'
 RABBITMQ_VIRTUAL_HOST = '/'
-RABBITMQ_QUEUE = 'person_durable_queue'
+RABBITMQ_EXCHANGE = 'people'
 
 
 def main():
@@ -31,22 +31,23 @@ def main():
         channel = connection.channel()
 
         # Define exchange
-        channel.exchange_declare(exchange='topic_logs',
-                                 exchange_type='topic')
+        channel.exchange_declare(exchange=RABBITMQ_EXCHANGE,
+                                 exchange_type='fanout')
 
         # Produce messages in loop with latency
         counter = 1
         while True:
             message = generate_fake_data()
-            routing_key = 'test.name.example' if counter % 10 == 1 else 'test.type.text'
             data = {
                 'id': counter,
                 'message': message
             }
-            channel.basic_publish(exchange='topic_logs',
-                                  routing_key=routing_key,
+            channel.basic_publish(exchange=RABBITMQ_EXCHANGE,
+                                  routing_key='',
                                   body=json.dumps(data),  # Serialized json
-                                  )
+                                  properties=pika.BasicProperties(
+                                      delivery_mode=2,  # Make message persistent
+                                  ))
 
             counter += 1
             logger.info(data)
