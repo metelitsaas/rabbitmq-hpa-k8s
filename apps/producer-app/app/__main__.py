@@ -8,12 +8,12 @@ from functions import *
 
 UPDATE_PERIOD = 3  # second
 
-RABBITMQ_HOST = '192.168.99.107'
-RABBITMQ_PORT = 30999
-RABBITMQ_LOGIN = 'FCv8IRXQVICBfUupdMsBOxk71o7JKd2r'
-RABBITMQ_PASS = 'mWsrsUhzhH1EH57Sze6DxWpX64cGqNvB'
+RABBITMQ_HOST = '192.168.99.108'
+RABBITMQ_PORT = 30470
+RABBITMQ_LOGIN = '5Hfzr3GH_mYnWKJEfpgS8-Mw-uZw4dB8'
+RABBITMQ_PASS = 'Va62NMDROXtki5tHnnGC--hqwe7GJeY1'
 RABBITMQ_VIRTUAL_HOST = '/'
-RABBITMQ_EXCHANGE = 'people'
+RABBITMQ_EXCHANGE = 'people_exchange'
 
 
 def main():
@@ -42,6 +42,7 @@ def main():
                 'id': counter,
                 'message': message
             }
+            # Send messages to exchange
             channel.basic_publish(exchange=RABBITMQ_EXCHANGE,
                                   routing_key='',
                                   body=json.dumps(data),  # Serialized json

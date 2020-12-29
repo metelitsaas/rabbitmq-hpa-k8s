@@ -7,12 +7,13 @@ from utils.logger import logger
 
 UPDATE_PERIOD = 3  # second
 
-RABBITMQ_HOST = '192.168.99.107'
-RABBITMQ_PORT = 30999
-RABBITMQ_LOGIN = 'FCv8IRXQVICBfUupdMsBOxk71o7JKd2r'
-RABBITMQ_PASS = 'mWsrsUhzhH1EH57Sze6DxWpX64cGqNvB'
+RABBITMQ_HOST = '192.168.99.108'
+RABBITMQ_PORT = 30470
+RABBITMQ_LOGIN = '5Hfzr3GH_mYnWKJEfpgS8-Mw-uZw4dB8'
+RABBITMQ_PASS = 'Va62NMDROXtki5tHnnGC--hqwe7GJeY1'
 RABBITMQ_VIRTUAL_HOST = '/'
-RABBITMQ_EXCHANGE = 'people'
+RABBITMQ_EXCHANGE = 'people_exchange'
+RABBITMQ_QUEUE = 'people_queue'
 
 
 def main():
@@ -34,15 +35,14 @@ def main():
                                  exchange_type='fanout')
 
         # Define queue
-        result = channel.queue_declare(queue='', durable=True)  # Create durable queue with dynamic name
-        queue_name = result.method.queue
+        channel.queue_declare(queue=RABBITMQ_QUEUE, durable=True)  # Create durable queue with dynamic name
 
         # Define bind
-        channel.queue_bind(exchange=RABBITMQ_EXCHANGE, queue=queue_name)
+        channel.queue_bind(exchange=RABBITMQ_EXCHANGE, queue=RABBITMQ_QUEUE)
 
-        # Consume messages from queue
+        # Consume messages from queue, based on exchange (for round-robin exchange support )
         channel.basic_qos(prefetch_count=1)  # receive only one message until confirm acknowledge
-        channel.basic_consume(queue=queue_name, on_message_callback=callback)
+        channel.basic_consume(queue=RABBITMQ_QUEUE, on_message_callback=callback)
         channel.start_consuming()
 
     except Exception as pika_ex:

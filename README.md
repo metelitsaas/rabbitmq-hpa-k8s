@@ -38,3 +38,12 @@ docker build \
 
 kubectl apply -f kubernetes/producer-app/deployment.yaml
 ```
+
+#### Deploy consumer-app
+```
+docker build \
+    --tag consumer-app:1.0 \
+    --file docker/consumer-app.dockerfile apps/consumer-app
+
+kubectl apply -f kubernetes/consumer-app/deployment.yaml
+```
