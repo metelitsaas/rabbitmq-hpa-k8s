@@ -10,6 +10,9 @@ RECONNECT_PERIOD = 1
 
 
 class SingletonMeta(type):
+    """
+    Singleton class realization
+    """
     _instances = {}
 
     def __call__(cls, *args, **kwargs):
@@ -20,7 +23,17 @@ class SingletonMeta(type):
 
 
 class Client(metaclass=SingletonMeta):
-    def __init__(self, host, port, virtual_host, login, password):
+    """
+    RabbitMQ client, realized as singleton
+    """
+    def __init__(self, host: str, port: int, virtual_host: str, login: str, password: str):
+        """
+        :param host: RabbitMQ hostname
+        :param port: RabbitMQ port
+        :param virtual_host: RabbitMQ virtual host
+        :param login: RabbitMQ login
+        :param password: RabbitMQ password
+        """
         self._host = host
         self._port = port
         self._virtual_host = virtual_host
@@ -31,7 +44,12 @@ class Client(metaclass=SingletonMeta):
                                                             credentials=self._credentials)
         self.connection = self.connect()
 
-    def connect(self):
+    def connect(self) -> pika.connection:
+        """
+        Connect to RabbitMQ instance
+        Reconnect number of attempts if disconnected, otherwise exit
+        :return: RabbitMQ connection
+        """
         attempt = 0
         while attempt < RECONNECT_ATTEMPTS:
 
@@ -47,8 +65,11 @@ class Client(metaclass=SingletonMeta):
         logger.critical('Unable to connect, signal to exit')
         sys.exit()
 
-    def get_channel(self):
-
+    def get_channel(self) -> Channel:
+        """
+        Get channel from current connection
+        :return: RabbitMQ channel
+        """
         try:
             return Channel(self)
 

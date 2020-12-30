@@ -3,6 +3,10 @@ from faker import Faker
 
 
 def generate_fake_data() -> dict:
+    """
+    Fake person data generator
+    :return: dictionary of data
+    """
     faker = Faker()
     return {
         'first_name': faker.first_name(),

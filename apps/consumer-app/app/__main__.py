@@ -8,7 +8,7 @@ def main():
 
     # Environment variables
     host = os.environ['RABBITMQ_HOST']
-    port = os.environ['RABBITMQ_PORT']
+    port = int(os.environ['RABBITMQ_PORT'])
     virtual_host = os.environ['RABBITMQ_VIRTUAL_HOST']
     login = os.environ['RABBITMQ_LOGIN']
     password = os.environ['RABBITMQ_PASS']
