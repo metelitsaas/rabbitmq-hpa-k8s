@@ -1,7 +1,6 @@
 import pika
 from pika.exceptions import StreamLostError, ConnectionClosedByBroker
 from functools import wraps
-from rabbitmq.client import Client
 from utils.logger import logger
 
 
@@ -9,7 +8,7 @@ class Channel:
     """
     RabbitMQ channel
     """
-    def __init__(self, client: Client):
+    def __init__(self, client):
         """
         :param client: RabbitMQ client
         """
