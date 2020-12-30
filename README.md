@@ -1,5 +1,18 @@
 ## RabbitMQ Kubernetes service
+### 1. Description
+Streaming service with RabbitMQ Operator based on Kubernetes (minikube),
+dummy Producer/Consumer Applications run by Python pika framework.
 
+### 2. Pipeline:
+
+producer-app -> exchange(name=people_exchange, type=fanout) -> queue(name=people_queue) -> consumer-app(x3, round-robin)
+
+### 3. Components:
+- RabbitMQ Server - 1
+- Producer Application - 1
+- Consumer Application - 3
+
+### 4. Installation
 #### Run minikube
 ```
 minikube start --vm-driver=virtualbox
@@ -11,7 +24,7 @@ eval $(minikube docker-env)
 kubectl apply -f kubernetes/dev-namespace.yaml
 ```
 
-#### Deploy RabbitMQ
+#### Deploy rabbitmq
 ```
 # Install RabbitMQ Cluster Operator
 kubectl apply -f https://github.com/rabbitmq/cluster-operator/releases/download/v1.3.0/cluster-operator.yml
