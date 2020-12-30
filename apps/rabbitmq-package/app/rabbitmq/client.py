@@ -63,6 +63,7 @@ class Client(metaclass=SingletonMeta):
 
         # Handle exit from program
         logger.critical('Unable to connect, signal to exit')
+        self.connection.close()
         sys.exit()
 
     def get_channel(self) -> Channel:

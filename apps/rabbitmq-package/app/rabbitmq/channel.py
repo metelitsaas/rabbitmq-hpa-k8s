@@ -108,9 +108,14 @@ class Channel:
                                         delivery_mode=2,  # Make message persistent
                                     ))
 
-    @_Decorators.reconnect_exception
     def subscribe(self):
         """
         Subscribe data from channel
         """
-        self._channel.start_consuming()
+        try:
+            self._channel.start_consuming()
+
+        except (StreamLostError, ConnectionClosedByBroker) as e:
+            logger.warning(e)
+            self._channel.stop_consuming()
+            self._client.connect()
