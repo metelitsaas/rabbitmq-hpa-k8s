@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq-configmap
+  namespace: dev
+data:
+  host: "rabbitmq"
+  port: "5672"
+  virtual_host: '/'

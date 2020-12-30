@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consumer-app
+  namespace: dev
+  labels:
+    app: consumer-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: consumer-app
+  template:
+    metadata:
+      labels:
+        app: consumer-app
+    spec:
+      containers:
+        - name: consumer-app
+          image: consumer-app:1.0
+          env:
+            - name: RABBITMQ_QUEUE
+              value: "people_queue"
+            - name: RABBITMQ_EXCHANGE_NAME
+              value: "people_exchange"
+            - name: RABBITMQ_EXCHANGE_TYPE
+              value: "fanout"
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: rabbitmq-configmap
+                  key: host
+            - name: RABBITMQ_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: rabbitmq-configmap
+                  key: port
+            - name: RABBITMQ_VIRTUAL_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: rabbitmq-configmap
+                  key: virtual_host
+            - name: RABBITMQ_LOGIN
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-default-user
+                  key: username
+            - name: RABBITMQ_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-default-user
+                  key: password

@@ -9,11 +9,11 @@ RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Install requirements
-COPY apps/producer-app/requirements.txt .
+COPY apps/consumer-app/requirements.txt .
 RUN pip install -r requirements.txt
 
 # Copy application
-COPY apps/producer-app/app/ app/
+COPY apps/consumer-app/app/ app/
 
 # Copy rabbitmq modules
 COPY apps/rabbitmq-package/app app/
