@@ -13,7 +13,8 @@ class Channel:
         :param client: RabbitMQ client
         """
         self._client = client
-        self._channel = client.connection.channel()
+        self._channel = None
+        self._create_channel()
 
     class _Decorators:
         """
@@ -28,13 +29,22 @@ class Channel:
             """
             @wraps(function)
             def wrapper(self, *method_args, **method_kwargs):
+
                 try:
                     return function(self, *method_args, **method_kwargs)
-                except (StreamLostError, ConnectionClosedByBroker) as e:
-                    logger.warning(e)
+
+                except (StreamLostError, ConnectionClosedByBroker) as error:
+                    logger.warning(error)
                     self._client.connect()
+                    self._create_channel()
 
             return wrapper
+
+    def _create_channel(self):
+        """
+        Create new RabbitMQ channel from current connection
+        """
+        self._channel = self._client.connection.channel()
 
     @_Decorators.reconnect_exception
     def exchange_declare(self, exchange_name: str, exchange_type: str):
@@ -108,14 +118,9 @@ class Channel:
                                         delivery_mode=2,  # Make message persistent
                                     ))
 
+    @_Decorators.reconnect_exception
     def subscribe(self):
         """
         Subscribe data from channel
         """
-        try:
-            self._channel.start_consuming()
-
-        except (StreamLostError, ConnectionClosedByBroker) as e:
-            logger.warning(e)
-            self._channel.stop_consuming()
-            self._client.connect()
+        self._channel.start_consuming()
