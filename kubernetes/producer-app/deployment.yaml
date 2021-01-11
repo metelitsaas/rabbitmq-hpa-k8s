@@ -41,12 +41,6 @@ spec:
                   name: rabbitmq-configmap
                   key: virtual_host
             - name: RABBITMQ_LOGIN
-              valueFrom:
-                secretKeyRef:
-                  name: rabbitmq-default-user
-                  key: username
+              value: "test_user"
             - name: RABBITMQ_PASS
-              valueFrom:
-                secretKeyRef:
-                  name: rabbitmq-default-user
-                  key: password
+              value: "test_pass"
