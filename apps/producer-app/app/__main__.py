@@ -13,7 +13,7 @@ def main():
     # Environment variables
     update_period = int(os.environ['UPDATE_PERIOD'])
     host = os.environ['RABBITMQ_HOST']
-    port = int(os.environ['RABBITMQ_PORT'])
+    port = os.environ['RABBITMQ_PORT']
     virtual_host = os.environ['RABBITMQ_VIRTUAL_HOST']
     login = os.environ['RABBITMQ_LOGIN']
     password = os.environ['RABBITMQ_PASS']

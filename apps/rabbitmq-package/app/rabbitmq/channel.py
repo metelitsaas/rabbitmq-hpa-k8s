@@ -55,7 +55,8 @@ class Channel:
         :return: RabbitMQ channel
         """
         self._channel.exchange_declare(exchange=exchange_name,
-                                       exchange_type=exchange_type)
+                                       exchange_type=exchange_type,
+                                       durable=True)
 
         return self
 
