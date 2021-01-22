@@ -1,24 +1,24 @@
 import os
 from receiver import Receiver
-from rabbitmq.client import Client
 from utils.logger import logger
 
 
 def main():
 
     # Environment variables
-    host = os.environ['RABBITMQ_HOST']
-    port = int(os.environ['RABBITMQ_PORT'])
-    virtual_host = os.environ['RABBITMQ_VIRTUAL_HOST']
-    login = os.environ['RABBITMQ_LOGIN']
-    password = os.environ['RABBITMQ_PASS']
-    exchange_name = os.environ['RABBITMQ_EXCHANGE_NAME']
-    exchange_type = os.environ['RABBITMQ_EXCHANGE_TYPE']
-    queue = os.environ['RABBITMQ_QUEUE']
+    connection_params = {
+        'host': os.environ['RABBITMQ_HOST'],
+        'port': os.environ['RABBITMQ_PORT'],
+        'vhost': os.environ['RABBITMQ_VHOST'],
+        'login': os.environ['RABBITMQ_LOGIN'],
+        'password': os.environ['RABBITMQ_PASS'],
+        'exchange_name': os.environ['RABBITMQ_EXCHANGE_NAME'],
+        'exchange_type': os.environ['RABBITMQ_EXCHANGE_TYPE'],
+        'queue_name': os.environ['RABBITMQ_QUEUE']
+    }
 
     # Receiver settings
-    client = Client(host, port, virtual_host, login, password)
-    receiver = Receiver(client, process, exchange_name, exchange_type, queue)
+    receiver = Receiver(connection_params, process)
     receiver.subscribe()
 
 

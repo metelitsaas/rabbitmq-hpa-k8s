@@ -1,28 +1,12 @@
-import sys
 import time
 import pika
 from pika.exceptions import AMQPConnectionError
-from rabbitmq.channel import Channel
 from utils.logger import logger
 
-RECONNECT_ATTEMPTS = 10
 RECONNECT_PERIOD = 1
 
 
-class SingletonMeta(type):
-    """
-    Singleton class realization
-    """
-    _instances = {}
-
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            instance = super().__call__(*args, **kwargs)
-            cls._instances[cls] = instance
-        return cls._instances[cls]
-
-
-class Client(metaclass=SingletonMeta):
+class RabbitClient:
     """
     RabbitMQ client, realized as singleton
     """
@@ -42,36 +26,25 @@ class Client(metaclass=SingletonMeta):
                                                             port=self._port,
                                                             virtual_host=self._virtual_host,
                                                             credentials=self._credentials)
-        self.connection = None
+        self.channel = None
         self.connect()
 
     def connect(self) -> pika.connection:
         """
-        Connect to RabbitMQ instance
+        Connect to RabbitMQ instance and create channel
         Reconnect number of attempts if disconnected, otherwise exit
         :return: RabbitMQ connection
         """
-        for attempt in range(RECONNECT_ATTEMPTS):
+        while True:
 
             try:
                 logger.info(f'Connecting to {self._host}:{self._port}')
-                self.connection = pika.BlockingConnection(self._connection_params)
+                connection = pika.BlockingConnection(self._connection_params)
+                self.channel = connection.channel()
                 logger.info(f'Connected')
-                return
+                break
 
-            except AMQPConnectionError:
-                logger.warning(f'Unable to connect, reconnect attempt: {attempt}')
+            except AMQPConnectionError as error:
+                logger.warning(error)
+                logger.warning(f'Unable to connect, reconnecting...')
                 time.sleep(RECONNECT_PERIOD)
-
-        # Handle exit from program
-        logger.critical('Unable to connect, signal to exit')
-        self.connection.close()
-        sys.exit()
-
-    def get_channel(self) -> Channel:
-        """
-        Get channel from current connection
-        :return: RabbitMQ channel
-        """
-        logger.info('Creating channel')
-        return Channel(self)

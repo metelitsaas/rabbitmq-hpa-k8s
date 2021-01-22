@@ -1,5 +1,29 @@
 import json
-from rabbitmq.client import Client
+from pika.exceptions import StreamLostError, ConnectionClosedByBroker
+from functools import wraps
+from utils.rabbit_client import RabbitClient
+from utils.logger import logger
+
+
+def reconnect_exception(function):
+    """
+    Reconnect if exception raised
+    :param function: wrapped function
+    :return: wrapper function
+    """
+    @wraps(function)
+    def wrapper(self, *method_args, **method_kwargs):
+        while True:
+
+            try:
+                function(self, *method_args, **method_kwargs)
+                break
+
+            except (StreamLostError, ConnectionClosedByBroker) as error:
+                logger.warning(error)
+                self.rabbit_client.connect()
+
+    return wrapper
 
 
 class Receiver:
@@ -7,31 +31,39 @@ class Receiver:
     RabbitMQ data receiver
     Get data exchange
     """
-    def __init__(self, client: Client, function, exchange_name: str, exchange_type: str, queue: str):
+    def __init__(self, params, function):
         """
-        :param client: RabbitMQ client
+        :param params: RabbitMQ client params
         :param function: external processing function
-        :param exchange_name: name of exchange
-        :param exchange_type: type of exchange
-        :param queue: name of queue
         """
-        self._channel = client.get_channel()
+        self.rabbit_client = RabbitClient(
+            params['host'],
+            params['port'],
+            params['vhost'],
+            params['login'],
+            params['password']
+        )
         self._function = function
-        self._exchange_name = exchange_name
-        self._exchange_type = exchange_type
-        self._queue = queue
+        self._rabbit_exchange_name = params['exchange_name']
+        self._rabbit_exchange_type = params['exchange_type']
+        self._rabbit_queue_name = params['queue_name']
         self._set()
 
+    @reconnect_exception
     def _set(self):
         """
         Set receiver configuration
         """
-        self._channel \
-            .exchange_declare(self._exchange_name, self._exchange_type) \
-            .queue_declare(self._queue) \
-            .queue_bind(self._exchange_name, self._queue) \
-            .basic_qos() \
-            .basic_consume(self._queue, self._callback)
+        self.rabbit_client.channel \
+            .exchange_declare(exchange=self._rabbit_exchange_name,
+                              exchange_type=self._rabbit_exchange_type,
+                              durable=True)
+        self.rabbit_client.channel.queue_declare(queue=self._rabbit_queue_name, durable=True)
+        self.rabbit_client.channel.queue_bind(exchange=self._rabbit_exchange_name,
+                                              queue=self._rabbit_queue_name)
+        self.rabbit_client.channel.basic_qos(prefetch_count=1)
+        self.rabbit_client.channel.basic_consume(queue=self._rabbit_queue_name,
+                                                 on_message_callback=self._callback)
 
     def _callback(self, ch, method, properties, body):
         """
@@ -45,8 +77,9 @@ class Receiver:
         self._function(data)
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
+    @reconnect_exception
     def subscribe(self):
         """
         Get data function
         """
-        self._channel.subscribe()
+        self.rabbit_client.channel.start_consuming()

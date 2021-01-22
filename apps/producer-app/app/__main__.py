@@ -1,9 +1,7 @@
 import os
 import time
 import random
-import json
 from utils.logger import logger
-from rabbitmq.client import Client
 from loader import Loader
 from functions import *
 
@@ -12,17 +10,18 @@ def main():
 
     # Environment variables
     update_period = int(os.environ['UPDATE_PERIOD'])
-    host = os.environ['RABBITMQ_HOST']
-    port = os.environ['RABBITMQ_PORT']
-    virtual_host = os.environ['RABBITMQ_VIRTUAL_HOST']
-    login = os.environ['RABBITMQ_LOGIN']
-    password = os.environ['RABBITMQ_PASS']
-    exchange_name = os.environ['RABBITMQ_EXCHANGE_NAME']
-    exchange_type = os.environ['RABBITMQ_EXCHANGE_TYPE']
+    connection_params = {
+        'host': os.environ['RABBITMQ_HOST'],
+        'port': os.environ['RABBITMQ_PORT'],
+        'vhost': os.environ['RABBITMQ_VHOST'],
+        'login': os.environ['RABBITMQ_LOGIN'],
+        'password': os.environ['RABBITMQ_PASS'],
+        'exchange_name': os.environ['RABBITMQ_EXCHANGE_NAME'],
+        'exchange_type': os.environ['RABBITMQ_EXCHANGE_TYPE']
+    }
 
     # Loader settings
-    client = Client(host, port, virtual_host, login, password)
-    people_loader = Loader(client, exchange_name, exchange_type)
+    people_loader = Loader(connection_params)
 
     # Produce messages in loop with latency
     counter = 1
@@ -35,8 +34,7 @@ def main():
         }
 
         # Serialize and send data
-        serialized_data = json.dumps(data)
-        people_loader.load(serialized_data)
+        people_loader.load(data)
 
         # Increment counter and wait for new iteration
         counter += 1
