@@ -24,6 +24,7 @@ def reconnect_exception(function):
             except (StreamLostError, ConnectionClosedByBroker) as error:
                 logger.warning(error)
                 self.rabbit_client.connect()
+                self.set()
 
     return wrapper
 
@@ -46,7 +47,7 @@ class Loader:
         )
         self._rabbit_exchange_name = params['exchange_name']
         self._rabbit_exchange_type = params['exchange_type']
-        self._set()
+        self.set()
 
     @staticmethod
     def _datetime_handler(value) -> str:
@@ -61,7 +62,7 @@ class Loader:
             return value
 
     @reconnect_exception
-    def _set(self) -> None:
+    def set(self) -> None:
         """
         Set loader configuration
         """

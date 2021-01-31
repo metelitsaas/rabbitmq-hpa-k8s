@@ -22,6 +22,7 @@ def reconnect_exception(function):
             except (StreamLostError, ConnectionClosedByBroker) as error:
                 logger.warning(error)
                 self.rabbit_client.connect()
+                self.set()
 
     return wrapper
 
@@ -47,10 +48,10 @@ class Receiver:
         self._rabbit_exchange_name = params['exchange_name']
         self._rabbit_exchange_type = params['exchange_type']
         self._rabbit_queue_name = params['queue_name']
-        self._set()
+        self.set()
 
     @reconnect_exception
-    def _set(self):
+    def set(self):
         """
         Set receiver configuration
         """

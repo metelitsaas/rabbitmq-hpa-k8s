@@ -3,6 +3,7 @@ import pika
 from pika.exceptions import AMQPConnectionError
 from utils.logger import logger
 
+
 RECONNECT_PERIOD = 1
 
 
