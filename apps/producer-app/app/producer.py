@@ -1,35 +1,11 @@
 import json
 import datetime
 import pika
-from pika.exceptions import StreamLostError, ConnectionClosedByBroker
-from functools import wraps
-from utils.logger import logger
-from utils.rabbit_client import RabbitClient
+from abc import ABC
+from utils.rabbit_manager import RabbitManager, reconnect_exception
 
 
-def reconnect_exception(function):
-    """
-    Reconnect if exception raised
-    :param function: wrapped function
-    :return: wrapper function
-    """
-    @wraps(function)
-    def wrapper(self, *method_args, **method_kwargs):
-        while True:
-
-            try:
-                function(self, *method_args, **method_kwargs)
-                break
-
-            except (StreamLostError, ConnectionClosedByBroker) as error:
-                logger.warning(error)
-                self.rabbit_client.connect()
-                self.set()
-
-    return wrapper
-
-
-class Producer:
+class Producer(RabbitManager, ABC):
     """
     RabbitMQ data producer
     Publish to exchange
@@ -38,16 +14,9 @@ class Producer:
         """
         :param params: RabbitMQ client params
         """
-        self.rabbit_client = RabbitClient(
-            params['host'],
-            params['port'],
-            params['vhost'],
-            params['login'],
-            params['password']
-        )
         self._rabbit_exchange_name = params['exchange_name']
         self._rabbit_exchange_type = params['exchange_type']
-        self.set()
+        super().__init__(params)
 
     @staticmethod
     def _datetime_handler(value) -> str:

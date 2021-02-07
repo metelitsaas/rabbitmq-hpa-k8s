@@ -1,33 +1,9 @@
 import json
-from pika.exceptions import StreamLostError, ConnectionClosedByBroker
-from functools import wraps
-from utils.rabbit_client import RabbitClient
-from utils.logger import logger
+from abc import ABC
+from utils.rabbit_manager import RabbitManager, reconnect_exception
 
 
-def reconnect_exception(function):
-    """
-    Reconnect if exception raised
-    :param function: wrapped function
-    :return: wrapper function
-    """
-    @wraps(function)
-    def wrapper(self, *method_args, **method_kwargs):
-        while True:
-
-            try:
-                function(self, *method_args, **method_kwargs)
-                break
-
-            except (StreamLostError, ConnectionClosedByBroker) as error:
-                logger.warning(error)
-                self.rabbit_client.connect()
-                self.set()
-
-    return wrapper
-
-
-class Consumer:
+class Consumer(RabbitManager, ABC):
     """
     RabbitMQ data consumer
     Get data exchange
@@ -37,18 +13,11 @@ class Consumer:
         :param params: RabbitMQ client params
         :param function: external processing function
         """
-        self.rabbit_client = RabbitClient(
-            params['host'],
-            params['port'],
-            params['vhost'],
-            params['login'],
-            params['password']
-        )
         self._rabbit_exchange_name = params['exchange_name']
         self._rabbit_exchange_type = params['exchange_type']
         self._rabbit_queue_name = params['queue_name']
         self._function = function
-        self.set()
+        super().__init__(params)
 
     @reconnect_exception
     def set(self):
