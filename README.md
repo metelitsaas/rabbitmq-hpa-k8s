@@ -16,7 +16,8 @@ producer-app -> exchange(name=people_exchange, type=fanout)
 ### 4. Installation
 #### Run minikube
 ```
-minikube start --vm-driver=virtualbox
+minikube start --vm-driver=virtualbox --cpus 3
+minikube addons enable metrics-server
 eval $(minikube docker-env)
 ```
 
