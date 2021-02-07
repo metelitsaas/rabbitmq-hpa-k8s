@@ -27,9 +27,9 @@ def reconnect_exception(function):
     return wrapper
 
 
-class Receiver:
+class Consumer:
     """
-    RabbitMQ data receiver
+    RabbitMQ data consumer
     Get data exchange
     """
     def __init__(self, params, function):
@@ -44,16 +44,16 @@ class Receiver:
             params['login'],
             params['password']
         )
-        self._function = function
         self._rabbit_exchange_name = params['exchange_name']
         self._rabbit_exchange_type = params['exchange_type']
         self._rabbit_queue_name = params['queue_name']
+        self._function = function
         self.set()
 
     @reconnect_exception
     def set(self):
         """
-        Set receiver configuration
+        Set channel configuration
         """
         self.rabbit_client.channel \
             .exchange_declare(exchange=self._rabbit_exchange_name,
@@ -79,8 +79,8 @@ class Receiver:
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     @reconnect_exception
-    def subscribe(self):
+    def run(self):
         """
-        Get data function
+        Main function
         """
         self.rabbit_client.channel.start_consuming()

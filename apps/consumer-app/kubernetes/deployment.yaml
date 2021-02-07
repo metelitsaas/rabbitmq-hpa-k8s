@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: consumer-app
-          image: consumer-app:1.0
+          image: consumer-app:1.1
           env:
             - name: RABBITMQ_QUEUE
               value: "people_queue"

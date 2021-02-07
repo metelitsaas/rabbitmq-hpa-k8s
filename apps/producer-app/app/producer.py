@@ -29,9 +29,9 @@ def reconnect_exception(function):
     return wrapper
 
 
-class Loader:
+class Producer:
     """
-    RabbitMQ data loader
+    RabbitMQ data producer
     Publish to exchange
     """
     def __init__(self, params):
@@ -64,7 +64,7 @@ class Loader:
     @reconnect_exception
     def set(self) -> None:
         """
-        Set loader configuration
+        Set channel configuration
         """
         self.rabbit_client.channel.exchange_declare(exchange=self._rabbit_exchange_name,
                                                     exchange_type=self._rabbit_exchange_type,

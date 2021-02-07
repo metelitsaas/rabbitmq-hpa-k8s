@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: producer-app
-          image: producer-app:1.0
+          image: producer-app:1.1
           env:
             - name: UPDATE_PERIOD
               value: "3"

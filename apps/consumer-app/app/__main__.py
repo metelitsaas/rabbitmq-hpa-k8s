@@ -1,5 +1,5 @@
 import os
-from receiver import Receiver
+from consumer import Consumer
 from utils.logger import logger
 
 
@@ -17,9 +17,9 @@ def main():
         'queue_name': os.environ['RABBITMQ_QUEUE']
     }
 
-    # Receiver settings
-    receiver = Receiver(connection_params, process)
-    receiver.subscribe()
+    # Consumer settings
+    consumer = Consumer(connection_params, process)
+    consumer.run()
 
 
 def process(data):
@@ -29,7 +29,7 @@ def process(data):
 if __name__ == '__main__':
 
     try:
-        logger.info('Consumer application started')
+        logger.info('Starting')
         main()
 
     except Exception as e:

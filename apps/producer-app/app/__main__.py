@@ -2,7 +2,7 @@ import os
 import time
 import random
 from utils.logger import logger
-from loader import Loader
+from producer import Producer
 from functions import *
 
 
@@ -20,8 +20,8 @@ def main():
         'exchange_type': os.environ['RABBITMQ_EXCHANGE_TYPE']
     }
 
-    # Loader settings
-    people_loader = Loader(connection_params)
+    # Producer settings
+    producer = Producer(connection_params)
 
     # Produce messages in loop with latency
     counter = 1
@@ -34,7 +34,7 @@ def main():
         }
 
         # Serialize and send data
-        people_loader.load(data)
+        producer.load(data)
 
         # Increment counter and wait for new iteration
         counter += 1
@@ -45,7 +45,7 @@ def main():
 if __name__ == '__main__':
 
     try:
-        logger.info('Producer application started')
+        logger.info('Starting')
         main()
 
     except Exception as e:

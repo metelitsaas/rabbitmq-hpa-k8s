@@ -5,7 +5,8 @@ dummy Producer/Consumer Applications run by Python pika framework.
 
 ### 2. Pipeline:
 
-producer-app -> exchange(name=people_exchange, type=fanout) -> queue(name=people_queue) -> consumer-app(x3, round-robin)
+producer-app -> exchange(name=people_exchange, type=fanout) 
+-> queue(name=people_queue) -> consumer-app(x3, round-robin)
 
 ### 3. Components:
 - RabbitMQ Server - 1
@@ -53,7 +54,7 @@ kubectl apply -f cluster/kubernetes/rabbitmq/rabbitmq-cluster.yaml
 #### Deploy producer-app
 ```
 DOCKER_BUILDKIT=1 docker build \
-    --tag producer-app:1.0 \
+    --tag producer-app:1.1 \
     --file apps/producer-app/docker/producer-app.dockerfile .
 
 kubectl apply -f apps/producer-app/kubernetes/deployment.yaml
@@ -62,7 +63,7 @@ kubectl apply -f apps/producer-app/kubernetes/deployment.yaml
 #### Deploy consumer-app
 ```
 DOCKER_BUILDKIT=1 docker build \
-    --tag consumer-app:1.0 \
+    --tag consumer-app:1.1 \
     --file apps/consumer-app/docker/consumer-app.dockerfile .
 
 kubectl apply -f apps/consumer-app/kubernetes/deployment.yaml
