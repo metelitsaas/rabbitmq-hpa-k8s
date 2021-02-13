@@ -55,7 +55,7 @@ kubectl apply -f cluster/kubernetes/rabbitmq/rabbitmq-cluster.yaml
 #### Deploy producer-app
 ```
 DOCKER_BUILDKIT=1 docker build \
-    --tag producer-app:1.1 \
+    --tag producer-app:1.2 \
     --file apps/producer-app/docker/producer-app.dockerfile .
 
 kubectl apply -f apps/producer-app/kubernetes/deployment.yaml
@@ -64,7 +64,7 @@ kubectl apply -f apps/producer-app/kubernetes/deployment.yaml
 #### Deploy consumer-app
 ```
 DOCKER_BUILDKIT=1 docker build \
-    --tag consumer-app:1.1 \
+    --tag consumer-app:1.2 \
     --file apps/consumer-app/docker/consumer-app.dockerfile .
 
 kubectl apply -f apps/consumer-app/kubernetes/deployment.yaml
