@@ -23,7 +23,7 @@ eval $(minikube docker-env)
 
 #### Set namespace
 ```
-kubectl apply -f cluster/kubernetes/dev-namespace.yaml
+kubectl apply -f kubernetes/dev-namespace.yaml
 ```
 
 #### Deploy rabbitmq
@@ -36,7 +36,7 @@ echo -n dev_user | base64 # output: ZGV2X3VzZXI=
 echo -n dev_pass | base64 # output: ZGV2X3Bhc3M=
 
 # Create secrets of RabbitMQ
-kubectl apply -f cluster/kubernetes/rabbitmq/rabbitmq-secret.yaml
+kubectl apply -f kubernetes/rabbitmq/rabbitmq-secret.yaml
 
 # Encode sha256 password for ConfigMap
 PWD_HEX=$(echo -n dev_pass | xxd -p)
@@ -46,26 +46,26 @@ SHA256=$(echo -n $HEX | xxd -r -p | shasum -a 256)
 echo "$SALT_HEX $SHA256" | xxd -r -p | base64  # output: q5lzzTONASWgosGBd4yRY8au/Wsu4gjlrq6U/nPz1cBX1lDs
 
 # Create ConfigMap of RabbitMQ
-kubectl apply -f cluster/kubernetes/rabbitmq/rabbitmq-configmap.yaml
+kubectl apply -f kubernetes/rabbitmq/rabbitmq-configmap.yaml
 
 # Create RabbitMQ Instance
-kubectl apply -f cluster/kubernetes/rabbitmq/rabbitmq-cluster.yaml
+kubectl apply -f kubernetes/rabbitmq/rabbitmq-cluster.yaml
 ```
 
 #### Deploy producer-app
 ```
 DOCKER_BUILDKIT=1 docker build \
     --tag producer-app:1.2 \
-    --file apps/producer-app/docker/producer-app.dockerfile .
+    --file docker/producer-app.dockerfile .
 
-kubectl apply -f apps/producer-app/kubernetes/deployment.yaml
+kubectl apply -f kubernetes/producer-app/deployment.yaml
 ```
 
 #### Deploy consumer-app
 ```
 DOCKER_BUILDKIT=1 docker build \
     --tag consumer-app:1.2 \
-    --file apps/consumer-app/docker/consumer-app.dockerfile .
+    --file docker/consumer-app.dockerfile .
 
-kubectl apply -f apps/consumer-app/kubernetes/deployment.yaml
+kubectl apply -f kubernetes/consumer-app/deployment.yaml
 ```
