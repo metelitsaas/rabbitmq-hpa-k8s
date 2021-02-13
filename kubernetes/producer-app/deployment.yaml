@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: producer-app
+  namespace: dev
+  labels:
+    app: producer-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: producer-app
+  template:
+    metadata:
+      labels:
+        app: producer-app
+    spec:
+      containers:
+        - name: producer-app
+          image: producer-app:1.2
+          resources:
+            limits:
+              cpu: 0.2
+              memory: 64Mi
+          env:
+            - name: UPDATE_PERIOD
+              value: "3"
+            - name: RABBITMQ_EXCHANGE_NAME
+              value: "people_exchange"
+            - name: RABBITMQ_EXCHANGE_TYPE
+              value: "fanout"
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: rabbitmq-configmap
+                  key: host
+            - name: RABBITMQ_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: rabbitmq-configmap
+                  key: port
+            - name: RABBITMQ_VHOST
+              valueFrom:
+                configMapKeyRef:
+                  name: rabbitmq-configmap
+                  key: virtual_host
+            - name: RABBITMQ_LOGIN
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-secret
+                  key: LOGIN
+            - name: RABBITMQ_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-secret
+                  key: PASSWORD
