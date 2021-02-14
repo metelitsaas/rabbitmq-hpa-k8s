@@ -15,7 +15,7 @@ data:
        "name": "dev_user",
        "password_hash": "q5lzzTONASWgosGBd4yRY8au/Wsu4gjlrq6U/nPz1cBX1lDs",
        "hashing_algorithm": "rabbit_password_hashing_sha256",
-       "tags": ""
+       "tags": "administrator"
       }
      ],
      "vhosts": [

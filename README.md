@@ -72,3 +72,10 @@ DOCKER_BUILDKIT=1 docker build \
 
 kubectl apply -f kubernetes/consumer-app/deployment.yaml
 ```
+
+#### RabbitMQ REST API
+```
+# Testing RabbitMQ API access
+curl -i -u dev_user:dev_pass http://$(minikube ip):30001/api/queues/dev/people_queue
+
+```
