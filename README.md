@@ -50,6 +50,9 @@ kubectl apply -f kubernetes/rabbitmq/rabbitmq-configmap.yaml
 
 # Create RabbitMQ Instance
 kubectl apply -f kubernetes/rabbitmq/rabbitmq-cluster.yaml
+
+# Create RabbitMQ external service
+kubectl apply -f kubernetes/rabbitmq/rabbitmq-service.yaml
 ```
 
 #### Deploy producer-app
