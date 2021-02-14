@@ -1,15 +1,16 @@
 ## RabbitMQ Kubernetes service
 ### 1. Description
 Streaming service with RabbitMQ Operator based on Kubernetes (minikube),
-dummy Producer/Consumer Applications run by Python pika framework.
+dummy Producer/Consumer Applications run by Python pika framework. RabbitMQ Metric Server runs by Flask framework
+and takes metrics from RabbitMQ REST API.
 
 ### 2. Pipeline:
-
 producer-app -> exchange(name=people_exchange, type=fanout) 
 -> queue(name=people_queue) -> consumer-app(x3, round-robin)
 
 ### 3. Components:
 - RabbitMQ Server - 1
+- RabbitMQ Metric Server - 1
 - Producer Application - 1
 - Consumer Application - 3
 
@@ -77,5 +78,4 @@ kubectl apply -f kubernetes/consumer-app/deployment.yaml
 ```
 # Testing RabbitMQ API access
 curl -i -u dev_user:dev_pass http://$(minikube ip):30001/api/queues/dev/people_queue
-
 ```
