@@ -1,6 +1,6 @@
 import json
-import pika
 from abc import ABC
+import pika
 from utils.rabbit_manager import RabbitManager
 
 

@@ -3,10 +3,11 @@ import time
 import random
 from utils.logger import logger
 from producer import Producer
-from functions import *
+from functions import generate_fake_data
 
 
 def main():
+    """ Main producer-app function"""
 
     # Environment variables
     update_period = int(os.environ['UPDATE_PERIOD'])
@@ -48,5 +49,5 @@ if __name__ == '__main__':
         logger.info('Starting')
         main()
 
-    except Exception as e:
-        logger.critical(e)
+    except Exception as exception:
+        logger.critical(exception)

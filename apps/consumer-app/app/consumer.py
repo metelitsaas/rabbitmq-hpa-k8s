@@ -29,7 +29,8 @@ class Consumer(RabbitManager, ABC):
         self._client.channel.queue_declare(queue=self._queue_name, durable=True)
         self._client.channel.queue_bind(exchange=self._exchange_name, queue=self._queue_name)
         self._client.channel.basic_qos(prefetch_count=1)
-        self._client.channel.basic_consume(queue=self._queue_name, on_message_callback=self._callback)
+        self._client.channel.basic_consume(queue=self._queue_name,
+                                           on_message_callback=self._callback)
 
     def _callback(self, ch, method, properties, body):
         """

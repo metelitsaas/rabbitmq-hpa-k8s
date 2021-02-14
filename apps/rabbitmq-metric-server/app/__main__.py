@@ -6,6 +6,7 @@ from api_1_0 import api as api_1_0_blueprint
 
 
 def main():
+    """ Main rabbitmq-metric-server function"""
 
     # Web-server environment variables
     server_params = {
@@ -28,5 +29,5 @@ if __name__ == '__main__':
         logger.info('Starting')
         main()
 
-    except Exception as e:
-        logger.critical(e)
+    except Exception as exception:
+        logger.critical(exception)

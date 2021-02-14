@@ -1,7 +1,7 @@
 import datetime
 from abc import ABCMeta, abstractmethod
-from pika.exceptions import StreamLostError, ConnectionClosedByBroker
 from functools import wraps
+from pika.exceptions import StreamLostError, ConnectionClosedByBroker
 from utils.logger import logger
 from utils.rabbit_client import RabbitClient
 

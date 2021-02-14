@@ -38,13 +38,16 @@ class RabbitClient:
         while True:
 
             try:
-                logger.info(f'Connecting to {self._host}:{self._port}')
+                logger.info('Connecting to %(host)s:%(port)s' % {
+                    'host': self._host,
+                    'port': self._port
+                })
                 connection = pika.BlockingConnection(self._connection_params)
                 self.channel = connection.channel()
-                logger.info(f'Connected')
+                logger.info('Connected')
                 break
 
             except AMQPConnectionError as error:
                 logger.warning(error)
-                logger.warning(f'Unable to connect, reconnecting...')
+                logger.warning('Unable to connect, reconnecting...')
                 time.sleep(RECONNECT_PERIOD)

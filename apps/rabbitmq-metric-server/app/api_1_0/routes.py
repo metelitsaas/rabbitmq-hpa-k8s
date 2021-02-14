@@ -7,6 +7,10 @@ from api_1_0 import api, errors, rabbitmq_params
 
 @api.route('/')
 def index():
+    """
+    API index response
+    :return:
+    """
     return 'API v1'
 
 

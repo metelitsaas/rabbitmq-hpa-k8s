@@ -4,6 +4,7 @@ from utils.logger import logger
 
 
 def main():
+    """ Main consumer-app function"""
 
     # Environment variables
     connection_params = {
@@ -23,6 +24,10 @@ def main():
 
 
 def process(data):
+    """
+    Data processing function
+    :param data: received data
+    """
     logger.info(data)
 
 
@@ -32,5 +37,5 @@ if __name__ == '__main__':
         logger.info('Starting')
         main()
 
-    except Exception as e:
-        logger.critical(e)
+    except Exception as exception:
+        logger.critical(exception)
