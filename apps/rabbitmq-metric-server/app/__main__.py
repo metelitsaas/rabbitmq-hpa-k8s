@@ -20,7 +20,7 @@ def main():
     app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1')
 
     # Run Flask web-server
-    app.run(debug=True, host=server_params['host'], port=server_params['port'])
+    app.run(debug=True, host=server_params['host'], port=server_params['port'], ssl_context='adhoc')
 
 
 if __name__ == '__main__':
