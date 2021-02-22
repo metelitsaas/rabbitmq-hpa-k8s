@@ -1,42 +1,60 @@
 import json
 import requests
+import datetime
 from requests.auth import HTTPBasicAuth
 from flask import jsonify
 from api_1_0 import api, errors, rabbitmq_params
 
 
+# TODO: Add liveness probe
 @api.route('/')
-def index():
+def get_status():
     """
-    API index response
-    :return:
+    Check web-server liveness
     """
-    return 'API v1'
+    return jsonify({'status': 'healthy'})
 
 
-@api.route('metrics/queues/<string:vhost_name>/<string:queue_name>', methods=['GET'])
-def get_queue_metrics(vhost_name: str, queue_name: str):
+@api.route('namespaces/<string:namespace>/services/<string:service_name>/'
+           '<string:queue_name>_<string:metric_name>', methods=['GET'])
+def get_queue_metric(namespace: str, service_name: str, queue_name: str, metric_name: str):
     """
     Get queue metrics from RabbitMQ API
-    :param vhost_name: name of RabbitMQ vhost
+    :param namespace: metric server namespace
+    :param service_name: metric server name
     :param queue_name: name of RabbitMQ queue
+    :param metric_name: name of RabbitMQ queue's metric
     :return: metrics in json format
     """
     url = f"http://{rabbitmq_params['host']}:{rabbitmq_params['port']}/api/" \
-          f"queues/{vhost_name}/{queue_name}"
+          f"queues/dev/{queue_name}"
 
     response = requests.get(url, auth=HTTPBasicAuth(rabbitmq_params['login'],
                                                     rabbitmq_params['password']))
     json_response = json.loads(response.text)
 
     if json_response.get('error'):
-        message = f"Can't find metrics for queue {queue_name} at vhost {vhost_name}"
+        message = f"Can't find metrics for queue {queue_name} at vhost dev"
         return errors.not_found(message)
 
     else:
         return jsonify({
-            'consumers': json_response['consumers'],
-            'messages': json_response['messages'],
-            'messages_ready': json_response['messages_ready'],
-            'messages_unacknowledged': json_response['messages_unacknowledged'],
+            'kind': 'MetricValueList',
+            'apiVersion': 'custom.metrics.k8s.io/v1beta1',
+            'metadata': {
+                'selfLink': '/apis/custom.metrics.k8s.io/v1beta1/'
+            },
+            'items': [
+                {
+                    'describedObject': {
+                        'kind': 'Service',
+                        'namespace': f'{namespace}',
+                        'name': f'{service_name}',
+                        'apiVersion': '/v1beta1'
+                    },
+                    'metricName': f'{queue_name}_{metric_name}',
+                    'timestamp': datetime.datetime.now().astimezone().isoformat(),
+                    'value': json_response[f'{metric_name}']
+                }
+            ]
         })

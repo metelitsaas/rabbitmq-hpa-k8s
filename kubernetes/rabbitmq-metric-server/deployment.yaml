@@ -1,34 +1,34 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: consumer-app
+  name: rabbitmq-metric-server
   namespace: dev
   labels:
-    app: consumer-app
+    app: rabbitmq-metric-server
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: consumer-app
+      app: rabbitmq-metric-server
   template:
     metadata:
       labels:
-        app: consumer-app
+        app: rabbitmq-metric-server
     spec:
       containers:
-        - name: consumer-app
-          image: consumer-app:1.3
-          resources:
-            limits:
-              cpu: 0.1
-              memory: 32Mi
+        - name: rabbitmq-metric-server
+          image: rabbitmq-metric-server:0.1
+          #resources: TODO: Add resources
+          #  limits:
+          #    cpu: 0.1
+          #    memory: 32Mi
+          ports:
+            - containerPort: 5000
           env:
-            - name: RABBITMQ_QUEUE
-              value: "people_queue"
-            - name: RABBITMQ_EXCHANGE_NAME
-              value: "people_exchange"
-            - name: RABBITMQ_EXCHANGE_TYPE
-              value: "fanout"
+            - name: SERVER_HOST
+              value: "0.0.0.0"
+            - name: SERVER_PORT
+              value: "5000"
             - name: RABBITMQ_HOST
               valueFrom:
                 configMapKeyRef:
@@ -38,7 +38,7 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: rabbitmq-configmap
-                  key: port
+                  key: api_port
             - name: RABBITMQ_VHOST
               valueFrom:
                 configMapKeyRef:

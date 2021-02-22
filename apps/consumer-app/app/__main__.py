@@ -1,6 +1,9 @@
 import os
+import time
 from consumer import Consumer
 from utils.logger import logger
+
+PROCESSING_LAG_SEC = 2
 
 
 def main():
@@ -29,6 +32,7 @@ def process(data):
     :param data: received data
     """
     logger.info(data)
+    time.sleep(PROCESSING_LAG_SEC)
 
 
 if __name__ == '__main__':

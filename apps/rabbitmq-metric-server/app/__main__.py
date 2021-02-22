@@ -17,7 +17,7 @@ def main():
     # Config Flask app
     app = Flask(__name__)
     app.register_blueprint(main_blueprint)
-    app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1')
+    app.register_blueprint(api_1_0_blueprint, url_prefix='/apis/custom.metrics.k8s.io/v1beta1')
 
     # Run Flask web-server
     app.run(debug=True, host=server_params['host'], port=server_params['port'], ssl_context='adhoc')
