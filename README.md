@@ -1,4 +1,4 @@
-## RabbitMQ Kubernetes HorizontalPodAutoscaler
+## RabbitMQ HorizontalPodAutoscaler Kubernetes
 ### 1. Description
 Streaming service with RabbitMQ Operator based on Kubernetes (minikube). RabbitMQ Metric Server runs by Flask framework
 and takes metrics from RabbitMQ REST API. Dummy Producer and Consumer Applications run by Python pika framework.
