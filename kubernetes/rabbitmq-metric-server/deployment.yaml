@@ -17,13 +17,21 @@ spec:
     spec:
       containers:
         - name: rabbitmq-metric-server
-          image: rabbitmq-metric-server:0.1
-          #resources: TODO: Add resources
-          #  limits:
-          #    cpu: 0.1
-          #    memory: 32Mi
+          image: rabbitmq-metric-server:0.2
+          resources:
+            limits:
+              cpu: 0.1
+              memory: 64Mi
           ports:
             - containerPort: 5000
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+              scheme: HTTPS
+            initialDelaySeconds: 5
+            periodSeconds: 3
+            failureThreshold: 3
           env:
             - name: SERVER_HOST
               value: "0.0.0.0"

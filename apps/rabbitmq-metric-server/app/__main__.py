@@ -5,6 +5,7 @@ from main import main as main_blueprint
 from api_1_0 import api as api_1_0_blueprint
 
 
+# TODO: Add uWSGI
 def main():
     """ Main rabbitmq-metric-server function"""
 

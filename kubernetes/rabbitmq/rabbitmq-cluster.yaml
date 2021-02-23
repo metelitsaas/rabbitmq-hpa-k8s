@@ -10,10 +10,10 @@ spec:
   image: rabbitmq:3.8.9-management
   resources:
     requests:
-      cpu: 1
+      cpu: 500m
       memory: 512Mi
     limits:
-      cpu: 2
+      cpu: 1000m
       memory: 1Gi
   service:
     type: ClusterIP

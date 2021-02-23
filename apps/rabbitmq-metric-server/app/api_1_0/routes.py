@@ -6,19 +6,18 @@ from flask import jsonify
 from api_1_0 import api, errors, rabbitmq_params
 
 
-# TODO: Add liveness probe
 @api.route('/')
-def get_status():
+def index():
     """
-    Check web-server liveness
+    API index response
     """
-    return jsonify({'status': 'healthy'})
+    return jsonify({'apiVersion': '/v1beta1'})
 
 
 @api.route('namespaces/<string:namespace>/services/<string:service_name>/'
            '<string:queue_name>_<string:metric_name>', methods=['GET'])
 def get_queue_metric(namespace: str, service_name: str, queue_name: str, metric_name: str):
-    """
+    """ TODO: Add env variables
     Get queue metrics from RabbitMQ API
     :param namespace: metric server namespace
     :param service_name: metric server name
