@@ -17,7 +17,7 @@ def index():
 @api.route('namespaces/<string:namespace>/services/<string:service_name>/'
            '<string:queue_name>_<string:metric_name>', methods=['GET'])
 def get_queue_metric(namespace: str, service_name: str, queue_name: str, metric_name: str):
-    """ TODO: Add env variables
+    """
     Get queue metrics from RabbitMQ API
     :param namespace: metric server namespace
     :param service_name: metric server name
@@ -26,14 +26,14 @@ def get_queue_metric(namespace: str, service_name: str, queue_name: str, metric_
     :return: metrics in json format
     """
     url = f"http://{rabbitmq_params['host']}:{rabbitmq_params['port']}/api/" \
-          f"queues/dev/{queue_name}"
+          f"queues/{rabbitmq_params['vhost']}/{queue_name}"
 
     response = requests.get(url, auth=HTTPBasicAuth(rabbitmq_params['login'],
                                                     rabbitmq_params['password']))
     json_response = json.loads(response.text)
 
     if json_response.get('error'):
-        message = f"Can't find metrics for queue {queue_name} at vhost dev"
+        message = f"Can't find metrics for queue {queue_name} at vhost {rabbitmq_params['vhost']}"
         return errors.not_found(message)
 
     else:
