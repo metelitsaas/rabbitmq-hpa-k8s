@@ -9,7 +9,7 @@ spec:
   selector:
     app.kubernetes.io/name: rabbitmq
   type: NodePort
-  ports:
+  ports: # TODO: Exclude external services
     - name: amqp
       protocol: TCP
       port: 5672
