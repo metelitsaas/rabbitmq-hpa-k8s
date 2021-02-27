@@ -20,9 +20,6 @@ RUN --mount=type=cache,target=/root/.cache \
 # Copy package
 COPY apps/rabbitmq-metric-server/app/ app/
 
-# Open port
-EXPOSE 5000
-
 # Run app
 ENV PATH="/opt/venv/bin:$PATH"
 ENV PYTHONPATH="/app"

@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: rabbitmq-metric-server
-          image: rabbitmq-metric-server:0.2
+          image: rabbitmq-metric-server:1.0
           resources:
             limits:
               cpu: 0.1

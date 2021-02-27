@@ -5,7 +5,6 @@ from main import main as main_blueprint
 from api_1_0 import api as api_1_0_blueprint
 
 
-# TODO: Add uWSGI
 def main():
     """ Main rabbitmq-metric-server function"""
 
@@ -21,7 +20,11 @@ def main():
     app.register_blueprint(api_1_0_blueprint, url_prefix='/apis/custom.metrics.k8s.io/v1beta1')
 
     # Run Flask web-server
-    app.run(debug=True, host=server_params['host'], port=server_params['port'], ssl_context='adhoc')
+    app.run(debug=True,
+            threaded=True,
+            host=server_params['host'],
+            port=server_params['port'],
+            ssl_context='adhoc')
 
 
 if __name__ == '__main__':

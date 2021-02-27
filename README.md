@@ -60,7 +60,7 @@ kubectl apply -f kubernetes/rabbitmq/rabbitmq-service.yaml
 #### Deploy rabbitmq-metric-server
 ```
 DOCKER_BUILDKIT=1 docker build \
-    --tag rabbitmq-metric-server:0.2 \
+    --tag rabbitmq-metric-server:1.0 \
     --file docker/rabbitmq-metric-server.dockerfile .
 
 kubectl apply -f kubernetes/rabbitmq-metric-server/deployment.yaml
