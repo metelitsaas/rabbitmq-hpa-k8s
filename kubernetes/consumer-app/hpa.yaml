@@ -16,5 +16,5 @@ spec:
         target:
           kind: Service
           name: rabbitmq-metric-server
-        metricName: people_queue_messages
+        metricName: people_queue-messages
         targetValue: 20

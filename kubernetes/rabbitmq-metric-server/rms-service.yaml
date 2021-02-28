@@ -10,6 +10,7 @@ spec:
     app: rabbitmq-metric-server
   type: ClusterIP
   ports:
-    - protocol: TCP
+    - name: https
+      protocol: TCP
       port: 443
-      targetPort: 5000
+      targetPort: 443

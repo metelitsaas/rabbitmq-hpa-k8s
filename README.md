@@ -1,19 +1,18 @@
 ## RabbitMQ HorizontalPodAutoscaler Kubernetes
 ### 1. Description
-Streaming service with RabbitMQ Operator based on Kubernetes (minikube). RabbitMQ Metric Server runs by Flask framework
-and takes metrics from RabbitMQ REST API. Dummy Producer and Consumer Applications run by Python pika framework.
-Horizontal Pod Autoscaler reads queue's messages count from RabbitMQ Metric Server and controls count 
-of Consumer App's replicas.
+Example of Kubernetes HorizontalPodAutoscaler, based on custom metrics from RabbitMQ REST API.
+Applications producer-app and consumer-app exchange messages through RabbitMQ Operator, the number 
+of consumer-app replicas is controlled by queue length from rabbitmq-metric-server (Flask+uWSGI+NGINX).
 
 ### 2. Pipeline:
 producer-app -> exchange(name=people_exchange, type=fanout) 
 -> queue(name=people_queue) -> consumer-app(HPA, round-robin)
 
 ### 3. Components:
-- RabbitMQ Server
-- RabbitMQ Metric Server
-- Producer Application
-- Consumer Application
+- rabbitmq
+- rabbitmq-metric-server
+- producer-application
+- consumer-application
 
 ### 4. Installation
 #### Run minikube
@@ -52,19 +51,34 @@ kubectl apply -f kubernetes/rabbitmq/rabbitmq-configmap.yaml
 
 # Create RabbitMQ Instance
 kubectl apply -f kubernetes/rabbitmq/rabbitmq-cluster.yaml
-
-# Create RabbitMQ external service
-kubectl apply -f kubernetes/rabbitmq/rabbitmq-service.yaml
 ```
 
 #### Deploy rabbitmq-metric-server
 ```
 DOCKER_BUILDKIT=1 docker build \
     --tag rabbitmq-metric-server:1.0 \
-    --file docker/rabbitmq-metric-server.dockerfile .
+    --file docker/rabbitmq-metric-server.dockerfile . 
 
-kubectl apply -f kubernetes/rabbitmq-metric-server/deployment.yaml
-kubectl apply -f kubernetes/rabbitmq-metric-server/service.yaml
+# Generate TLS certificate and key
+openssl req -newkey rsa:2048 -nodes -keyout nginx.key -x509 -days 365 -out nginx.crt
+
+# Encode certificate and key by base64 
+base64 nginx.crt
+base64 nginx.key
+
+# Create secrets of TLS NGINX
+kubectl apply -f kubernetes/rabbitmq-metric-server/nginx-secret.yaml
+
+# Create ConfigMap of NGINX configurations
+kubectl apply -f kubernetes/rabbitmq-metric-server/nginx-configmap.yaml
+
+# Create rabbitmq-metric-server deployment
+kubectl apply -f kubernetes/rabbitmq-metric-server/rms-deployment.yaml
+
+# Create rabbitmq-metric-server service
+kubectl apply -f kubernetes/rabbitmq-metric-server/rms-service.yaml
+
+# Create custom metrics API service
 kubectl apply -f kubernetes/rabbitmq-metric-server/api-service.yaml
 ```
 

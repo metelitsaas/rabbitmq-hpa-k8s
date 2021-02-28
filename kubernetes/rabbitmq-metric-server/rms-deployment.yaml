@@ -15,7 +15,26 @@ spec:
       labels:
         app: rabbitmq-metric-server
     spec:
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: nginx-secret
+        - name: config-volume
+          configMap:
+            name: nginx-configmap
+            items:
+              - key: default.conf
+                path: default.conf
       containers:
+        - name: nginx
+          image: nginx:1.19.7
+          ports:
+            - containerPort: 443
+          volumeMounts:
+            - name: secret-volume
+              mountPath: /etc/nginx/ssl
+            - name: config-volume
+              mountPath: /etc/nginx/conf.d/
         - name: rabbitmq-metric-server
           image: rabbitmq-metric-server:1.0
           resources:
@@ -27,16 +46,12 @@ spec:
           livenessProbe:
             httpGet:
               path: /health
-              port: 5000
+              port: 443
               scheme: HTTPS
             initialDelaySeconds: 5
             periodSeconds: 3
             failureThreshold: 3
           env:
-            - name: SERVER_HOST
-              value: "0.0.0.0"
-            - name: SERVER_PORT
-              value: "5000"
             - name: RABBITMQ_HOST
               valueFrom:
                 configMapKeyRef:

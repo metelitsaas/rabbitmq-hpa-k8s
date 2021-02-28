@@ -5,6 +5,13 @@ FROM python:3.7-slim
 ENV TZ=UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        libgtk2.0-dev \
+        gcc && \
+    apt-get clean
+
 # Set virtualenv
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
@@ -20,7 +27,9 @@ RUN --mount=type=cache,target=/root/.cache \
 # Copy package
 COPY apps/rabbitmq-metric-server/app/ app/
 
+# Create user
+RUN useradd user
+
 # Run app
 ENV PATH="/opt/venv/bin:$PATH"
-ENV PYTHONPATH="/app"
-CMD ["python", "app"]
+CMD ["uwsgi", "--ini", "app/uwsgi.ini", "--enable-threads"]
