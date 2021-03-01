@@ -1,7 +1,7 @@
 import requests
 import datetime
 from requests.auth import HTTPBasicAuth
-from requests.exceptions import ConnectionError, ReadTimeout
+from requests.exceptions import ReadTimeout, ConnectionError, HTTPError
 from flask import jsonify
 from utils.logger import logger
 from api_1_0 import api, errors, rabbitmq_params
@@ -61,7 +61,7 @@ def get_queue_metric(namespace: str, service_name: str, queue_name: str, metric_
                   f"at vhost {rabbitmq_params['vhost']}"
         return errors.not_found(message)
 
-    except (ReadTimeout, ConnectionError) as exception:
+    except (ReadTimeout, ConnectionError, HTTPError) as exception:
         logger.warning(exception)
         message = f"Connection error at url: {url}"
         return errors.not_found(message)
