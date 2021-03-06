@@ -26,6 +26,7 @@ class RabbitClient:
                                                             port=self._port,
                                                             virtual_host=self._virtual_host,
                                                             credentials=self._credentials)
+        self._connection = None
         self.channel = None
         self.connect()
 
@@ -42,8 +43,8 @@ class RabbitClient:
                     'host': self._host,
                     'port': self._port
                 })
-                connection = pika.BlockingConnection(self._connection_params)
-                self.channel = connection.channel()
+                self._connection = pika.BlockingConnection(self._connection_params)
+                self.channel = self._connection.channel()
                 logger.info('Connected')
                 break
 
@@ -51,3 +52,10 @@ class RabbitClient:
                 logger.warning(error)
                 logger.warning('Unable to connect, reconnecting...')
                 time.sleep(RECONNECT_PERIOD)
+
+    def disconnect(self) -> None:
+        """
+        Close channel and connection to RabbitMQ
+        """
+        self._connection.close()
+        self.channel.close()

@@ -44,6 +44,12 @@ class RabbitManager(metaclass=ABCMeta):
                     self._client.connect()
                     self._set()
 
+                except Exception as error:
+                    logger.exception(error)
+                    logger.critical('Unhandled exception, disconnecting from RabbitMQ')
+                    self._client.disconnect()
+                    break
+
         return wrapper
 
     @abstractmethod
