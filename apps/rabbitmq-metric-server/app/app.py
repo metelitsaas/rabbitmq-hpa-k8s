@@ -20,4 +20,5 @@ if __name__ == '__main__':
         app.run(host=HOST, port=PORT, debug=True, threaded=True)
 
     except Exception as exception:
-        logger.critical(exception)
+        logger.exception(exception)
+        logger.critical('Critical exception')

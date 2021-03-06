@@ -1,7 +1,7 @@
 import datetime
 from abc import ABCMeta, abstractmethod
 from functools import wraps
-from pika.exceptions import StreamLostError, ConnectionClosedByBroker
+from pika.exceptions import StreamLostError, ConnectionClosedByBroker, AMQPHeartbeatTimeout
 from utils.logger import logger
 from utils.rabbit_client import RabbitClient
 
@@ -39,7 +39,7 @@ class RabbitManager(metaclass=ABCMeta):
                     function(self, *method_args, **method_kwargs)
                     break
 
-                except (StreamLostError, ConnectionClosedByBroker) as error:
+                except (StreamLostError, ConnectionClosedByBroker, AMQPHeartbeatTimeout) as error:
                     logger.warning(error)
                     self._client.connect()
                     self._set()
@@ -62,4 +62,4 @@ class RabbitManager(metaclass=ABCMeta):
         if isinstance(value, datetime.datetime):
             return value.isoformat()
         else:
-            return value
+            return str(value)

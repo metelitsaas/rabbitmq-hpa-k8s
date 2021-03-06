@@ -50,4 +50,5 @@ if __name__ == '__main__':
         main()
 
     except Exception as exception:
-        logger.critical(exception)
+        logger.exception(exception)
+        logger.critical('Critical exception')
